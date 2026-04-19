@@ -1,0 +1,14 @@
+# Model files (too large for GitHub — upload to HuggingFace)
+*.gguf
+*.bin
+*.safetensors
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
