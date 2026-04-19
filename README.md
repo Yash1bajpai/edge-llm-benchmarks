@@ -5,6 +5,7 @@
 ![Model](https://img.shields.io/badge/Model-TinyLlama--1.1B-blue)
 ![Quantization](https://img.shields.io/badge/Quantization-FP16%20%7C%20INT8%20%7C%20INT4-orange)
 ![Runtime](https://img.shields.io/badge/Runtime-llama.cpp-green)
+![HuggingFace](https://img.shields.io/badge/🤗-Models%20on%20HuggingFace-yellow)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
 ---
@@ -19,13 +20,13 @@ This repo answers that question with **real, reproducible benchmarks** across 5 
 
 ## 📦 Models Tested
 
-| Model | Format | Size | RAM Usage |
-|-------|--------|------|-----------|
-| TinyLlama-1.1B | FP16 | ~2.2 GB | ~2212 MiB |
-| TinyLlama-1.1B | INT8 (Q8_0) | ~1.1 GB | ~1229 MiB |
-| TinyLlama-1.1B | INT4 (Q4_0) | ~670 MB | ~744 MiB |
+| Model | Format | Size | RAM Usage | Download |
+|-------|--------|------|-----------|----------|
+| TinyLlama-1.1B | FP16 | ~2.2 GB | ~2212 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-FP16.gguf) |
+| TinyLlama-1.1B | INT8 (Q8_0) | ~1.1 GB | ~1229 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-INT8.gguf) |
+| TinyLlama-1.1B | INT4 (Q4_0) | ~670 MB | ~744 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/Tinyllama-INT4.gguf) |
 
-> 🔗 Download models from HuggingFace: [Coming Soon]
+> All models are in GGUF format, ready to run with llama.cpp — no conversion needed.
 
 ---
 
@@ -38,13 +39,13 @@ cd llama.cpp
 cmake -B build
 cmake --build build --config Release
 
-# 2. Place your GGUF models in models/
-# models/TinyLlama-FP16.gguf
-# models/TinyLlama-INT8.gguf
-# models/Tinyllama-INT4.gguf
+# 2. Download a model from HuggingFace (links above) and place in models/
 
 # 3. Run a benchmark
 ./build/bin/llama-cli -m models/TinyLlama-FP16.gguf --single-turn --seed 42 -n 150 -p "Your prompt here"
+
+# 4. Or run the full benchmark suite
+bash scripts/run_benchmark.sh models/TinyLlama-FP16.gguf FP16
 ```
 
 ---
@@ -81,9 +82,9 @@ cmake --build build --config Release
 
 | Model | Valid JSON? | Followed Format? | Notes |
 |-------|-----------|-----------------|-------|
-| FP16 | ✅ | ⚠️ Partial | Wrapped in ```json markdown block, solution field hallucinated extra content |
-| INT8 | ✅ | ✅ Best | Raw valid JSON, no markdown wrapper, solution slightly expanded but acceptable |
-| INT4 | ❌ | ❌ | Added prose explanation before JSON, solution value was a nested object (malformed) |
+| FP16 | ✅ | ⚠️ Partial | Wrapped in markdown block, solution hallucinated extra content |
+| INT8 | ✅ | ✅ Best | Raw valid JSON, no markdown wrapper |
+| INT4 | ❌ | ❌ | Added prose preamble, malformed nested object |
 
 **Winner: INT8** — Surprisingly outperformed FP16 on strict formatting.
 
@@ -167,10 +168,10 @@ cmake --build build --config Release
 ## 🗺️ Roadmap
 
 - [x] TinyLlama 1.1B — FP16, INT8, INT4 (Q4_0)
+- [x] HuggingFace model uploads — all 3 GGUF files available for download
 - [ ] TinyLlama 1.1B — Q4_K_M, Q5_K_M (better quantization methods)
 - [ ] Phi-2 (2.7B) — FP16, INT8, INT4
 - [ ] Qwen2-1.5B — FP16, INT8, INT4
-- [ ] HuggingFace model uploads for direct download
 - [ ] Automated benchmark script
 
 ---
@@ -178,6 +179,7 @@ cmake --build build --config Release
 ## 🛠️ Tech Stack
 
 - **Runtime:** [llama.cpp](https://github.com/ggml-org/llama.cpp)
+- **Models:** [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks)
 - **OS:** Ubuntu (WSL2) on Windows
 - **Hardware:** CPU-only inference
 - **Format:** GGUF
@@ -189,6 +191,7 @@ cmake --build build --config Release
 **Yash Bajpai** — Aspiring NLP & Edge AI Engineer
 
 [![GitHub](https://img.shields.io/badge/GitHub-Yash1bajpai-black?logo=github)](https://github.com/Yash1bajpai)
+[![HuggingFace](https://img.shields.io/badge/🤗-Yash1bajpai-yellow)](https://huggingface.co/Yash1bajpai)
 
 ---
 
