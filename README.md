@@ -25,8 +25,8 @@ This repo answers that question with **real, reproducible benchmarks** across 5 
 | TinyLlama-1.1B | FP16 | ~2.2 GB | ~2212 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-FP16.gguf) |
 | TinyLlama-1.1B | INT8 (Q8_0) | ~1.1 GB | ~1229 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-INT8.gguf) |
 | TinyLlama-1.1B | INT4 (Q4_0) | ~670 MB | ~744 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/Tinyllama-INT4.gguf) |
-| TinyLlama-1.1B | Q4_K_M | ~750 MB | ~800 MiB | Coming Soon |
-| TinyLlama-1.1B | Q5_K_M | ~900 MB | ~950 MiB | Coming Soon |
+| TinyLlama-1.1B | Q4_K_M | ~750 MB | ~800 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-Q4_K_M.gguf) |
+| TinyLlama-1.1B | Q5_K_M | ~900 MB | ~950 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-Q5_K_M.gguf) |
 
 > All models in GGUF format — ready to run with llama.cpp, no conversion needed.
 
@@ -180,8 +180,7 @@ bash scripts/run_benchmark.sh models/TinyLlama-FP16.gguf FP16
 
 - [x] TinyLlama 1.1B — FP16, INT8, INT4 (Q4_0)
 - [x] TinyLlama 1.1B — Q4_K_M, Q5_K_M
-- [x] HuggingFace model uploads — GGUF files available for download
-- [ ] Upload Q4_K_M and Q5_K_M to HuggingFace
+- [x] HuggingFace uploads — all 5 GGUF files available for download
 - [ ] Phi-3-mini (3.8B) — FP16, INT8, INT4 on Lightning AI
 - [ ] Mistral-7B — INT4, Q4_K_M on Lightning AI
 - [ ] Automated Python benchmark script with CSV output
