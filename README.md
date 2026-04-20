@@ -1,9 +1,9 @@
 # 🧪 Edge LLM Benchmarks
 
-> Systematically benchmarking quantized Large Language Models for Edge AI deployment — comparing quality degradation across FP16, INT8, and INT4 formats.
+> Systematically benchmarking quantized Large Language Models for Edge AI deployment — comparing quality degradation across FP16, INT8, INT4, Q4_K_M, and Q5_K_M formats.
 
 ![Model](https://img.shields.io/badge/Model-TinyLlama--1.1B-blue)
-![Quantization](https://img.shields.io/badge/Quantization-FP16%20%7C%20INT8%20%7C%20INT4-orange)
+![Quantization](https://img.shields.io/badge/Quantization-FP16%20%7C%20INT8%20%7C%20INT4%20%7C%20K--Quant-orange)
 ![Runtime](https://img.shields.io/badge/Runtime-llama.cpp-green)
 ![HuggingFace](https://img.shields.io/badge/🤗-Models%20on%20HuggingFace-yellow)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
@@ -14,7 +14,7 @@
 
 When deploying LLMs on edge devices (mobile, embedded systems, IoT), memory is the primary constraint. Quantization reduces model size drastically — but at what cost to output quality?
 
-This repo answers that question with **real, reproducible benchmarks** across 5 critical capability dimensions.
+This repo answers that question with **real, reproducible benchmarks** across 5 critical capability dimensions — testing 5 quantization formats on TinyLlama 1.1B.
 
 ---
 
@@ -25,8 +25,10 @@ This repo answers that question with **real, reproducible benchmarks** across 5 
 | TinyLlama-1.1B | FP16 | ~2.2 GB | ~2212 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-FP16.gguf) |
 | TinyLlama-1.1B | INT8 (Q8_0) | ~1.1 GB | ~1229 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/TinyLlama-INT8.gguf) |
 | TinyLlama-1.1B | INT4 (Q4_0) | ~670 MB | ~744 MiB | [🤗 HuggingFace](https://huggingface.co/Yash1bajpai/tinyllama-1.1b-gguf-benchmarks/blob/main/Tinyllama-INT4.gguf) |
+| TinyLlama-1.1B | Q4_K_M | ~750 MB | ~800 MiB | Coming Soon |
+| TinyLlama-1.1B | Q5_K_M | ~900 MB | ~950 MiB | Coming Soon |
 
-> All models are in GGUF format, ready to run with llama.cpp — no conversion needed.
+> All models in GGUF format — ready to run with llama.cpp, no conversion needed.
 
 ---
 
@@ -39,140 +41,151 @@ cd llama.cpp
 cmake -B build
 cmake --build build --config Release
 
-# 2. Download a model from HuggingFace (links above) and place in models/
+# 2. Download a model from HuggingFace and place in models/
 
-# 3. Run a benchmark
+# 3. Run a single prompt
 ./build/bin/llama-cli -m models/TinyLlama-FP16.gguf --single-turn --seed 42 -n 150 -p "Your prompt here"
 
-# 4. Or run the full benchmark suite
+# 4. Run full benchmark suite
 bash scripts/run_benchmark.sh models/TinyLlama-FP16.gguf FP16
+
+# 5. Create K-Quant versions yourself
+./build/bin/llama-quantize models/TinyLlama-FP16.gguf models/TinyLlama-Q4_K_M.gguf Q4_K_M
+./build/bin/llama-quantize models/TinyLlama-FP16.gguf models/TinyLlama-Q5_K_M.gguf Q5_K_M
 ```
 
 ---
 
 ## 🧩 Benchmark Prompts
 
-| # | Category | Prompt Summary |
-|---|----------|----------------|
-| 1 | 🧠 Logic & Reasoning | Jane has 3 brothers puzzle |
-| 2 | 📋 JSON Formatting | Extract problem/solution as strict JSON |
-| 3 | 📝 Constraint Adherence | Email starting with 'Unfortunately' / 'However' |
-| 4 | 📖 Reading Comprehension | Summarize JWST in exactly 15 words |
-| 5 | 🎭 Creativity & Tone | Grumpy sailor explaining smartphone in 3 sentences |
+| # | Category | Prompt |
+|---|----------|--------|
+| 1 | 🧠 Logic & Reasoning | Jane has 3 brothers. Each brother has 2 sisters. How many sisters does Jane have? Think step-by-step. |
+| 2 | 📋 JSON Formatting | Extract problem/solution strictly as JSON. No other text. |
+| 3 | 📝 Constraint Adherence | 2-sentence email. Sentence 1 starts with 'Unfortunately', Sentence 2 with 'However'. |
+| 4 | 📖 Reading Comprehension | Summarize JWST passage in exactly 15 words. |
+| 5 | 🎭 Creativity & Tone | Grumpy old sailor explains smartphone in exactly 3 sentences. |
 
 ---
 
-## 📊 Results Table
+## 📊 Results — All 5 Quantization Formats
 
 ### 1. 🧠 Logic & Reasoning
-*"Jane has 3 brothers. Each brother has 2 sisters. How many sisters does Jane have?"*
 
 | Model | Answer | Correct? | Notes |
 |-------|--------|----------|-------|
-| FP16 | 2 sisters | ✅ | Clean reasoning, correct answer |
-| INT8 | 5 sisters (3+2) | ❌ | Added brothers+sisters incorrectly |
-| INT4 | No answer given | ❌ | Looped on problem restatement, never concluded |
+| FP16 | 2 sisters | ✅ | Only model to answer correctly |
+| INT8 | 5 sisters | ❌ | Added brothers + sisters incorrectly |
+| INT4 (Q4_0) | No answer | ❌ | Looped forever, never concluded |
+| Q4_K_M | No answer | ❌ | Looped — step-by-step framework but no conclusion |
+| Q5_K_M | No answer | ❌ | Looped — same pattern as Q4_K_M |
 
-**Winner: FP16** — INT8 and INT4 both failed basic deductive reasoning.
+**Winner: FP16 only** — K-quants did not improve reasoning over Q4_0.
 
 ---
 
 ### 2. 📋 JSON Formatting
-*"Extract problem and solution as a valid JSON object. Do not add any other text."*
 
-| Model | Valid JSON? | Followed Format? | Notes |
-|-------|-----------|-----------------|-------|
-| FP16 | ✅ | ⚠️ Partial | Wrapped in markdown block, solution hallucinated extra content |
-| INT8 | ✅ | ✅ Best | Raw valid JSON, no markdown wrapper |
-| INT4 | ❌ | ❌ | Added prose preamble, malformed nested object |
+| Model | Valid JSON? | No Extra Text? | Notes |
+|-------|-----------|----------------|-------|
+| FP16 | ✅ | ❌ | Markdown wrapper added |
+| INT8 | ✅ | ✅ | Best — clean raw JSON |
+| INT4 (Q4_0) | ❌ | ❌ | Prose + malformed nested object |
+| Q4_K_M | ❌ | ❌ | Prose preamble + truncated JSON |
+| Q5_K_M | ❌ | ❌ | Prose preamble + truncated JSON |
 
-**Winner: INT8** — Surprisingly outperformed FP16 on strict formatting.
+**Winner: INT8** — K-quants performed worse than INT8 on structured output.
 
 ---
 
 ### 3. 📝 Constraint Adherence
-*"Write 2-sentence email. First sentence starts with 'Unfortunately', second with 'However'."*
 
-| Model | Starts with 'Unfortunately'? | Starts with 'However'? | Exactly 2 sentences? |
-|-------|------------------------------|------------------------|----------------------|
-| FP16 | ✅ | ✅ | ❌ Added 3rd sentence + sign-off |
-| INT8 | ✅ | ✅ | ❌ Added 3rd sentence + sign-off |
-| INT4 | ❌ | ❌ | ❌ Ignored both constraints completely |
+| Model | 'Unfortunately' first? | 'However' second? | 2 sentences only? |
+|-------|------------------------|-------------------|-------------------|
+| FP16 | ✅ | ✅ | ❌ Extra sentences |
+| INT8 | ✅ | ✅ | ❌ Extra sentences |
+| INT4 (Q4_0) | ❌ | ❌ | ❌ Ignored both |
+| Q4_K_M | ❌ | ✅ | ❌ 'Unfortunately' buried in middle |
+| Q5_K_M | ❌ | ✅ | ❌ 'Unfortunately' buried in middle |
 
-**Winner: FP16 / INT8 tied** — Both followed keyword constraints. INT4 failed completely.
+**Winner: FP16 / INT8 tied** — K-quants partially followed constraints but failed sentence starts.
 
 ---
 
-### 4. 📖 Reading Comprehension (Exact Word Count)
-*"Summarize in exactly 15 words."*
+### 4. 📖 Reading Comprehension (15-word limit)
 
-| Model | Word Count | Correct Count? | Notes |
-|-------|-----------|----------------|-------|
-| FP16 | ~45 words | ❌ | Repeated the passage almost verbatim |
-| INT8 | ~55 words | ❌ | Added extra sentence beyond the passage |
-| INT4 | ~40 words | ❌ | Slightly condensed but still far over limit |
+| Model | Word Count | Notes |
+|-------|-----------|-------|
+| FP16 | ~45 words | Repeated passage verbatim |
+| INT8 | ~55 words | Added extra sentence |
+| INT4 (Q4_0) | ~40 words | Still far over |
+| Q4_K_M | ~40 words | Still far over |
+| Q5_K_M | ~35 words | Closest to 15 but still over |
 
-**Winner: None** — All three models failed the exact word count constraint. Common weakness of small models.
+**Winner: Q5_K_M (partial)** — Slightly better compression but no model hit 15 words.
 
 ---
 
 ### 5. 🎭 Creativity & Tone
-*"You are a grumpy old sailor. Explain smartphone in exactly 3 sentences."*
 
-| Model | Sailor Tone? | Exactly 3 Sentences? | Notes |
-|-------|-------------|----------------------|-------|
-| FP16 | ❌ | ❌ (2 sentences) | Factual/neutral, no sailor character |
-| INT8 | ❌ | ❌ (2 sentences) | Same issue, added wrong etymology |
-| INT4 | ❌ | ❌ (4+ sentences) | No persona, went on too long |
+| Model | Sailor Persona? | Exactly 3 Sentences? | Notes |
+|-------|----------------|----------------------|-------|
+| FP16 | ❌ | ❌ (2 sent.) | Factual, no persona |
+| INT8 | ❌ | ❌ (2 sent.) | Factual, no persona |
+| INT4 (Q4_0) | ❌ | ❌ (4+ sent.) | Went on too long |
+| Q4_K_M | ❌ | ❌ (1 sent.) | One giant run-on sentence |
+| Q5_K_M | ❌ | ❌ (numbered list) | Formatted as list, no persona |
 
-**Winner: None** — All three models ignored the creative persona. TinyLlama 1.1B is too small for complex instruction-following.
-
----
-
-## 📈 Performance Scorecard
-
-| Category | FP16 | INT8 | INT4 |
-|----------|------|------|------|
-| 🧠 Reasoning | ✅ | ❌ | ❌ |
-| 📋 JSON Formatting | ⚠️ | ✅ | ❌ |
-| 📝 Constraint Adherence | ⚠️ | ⚠️ | ❌ |
-| 📖 Reading Comprehension | ❌ | ❌ | ❌ |
-| 🎭 Creativity & Tone | ❌ | ❌ | ❌ |
-| **Total Score** | **2/5** | **1.5/5** | **0/5** |
+**Winner: None** — All formats failed. Persona-following needs larger models.
 
 ---
 
-## ⚡ Speed vs Quality Tradeoff
+## 📈 Full Performance Scorecard
 
-| Model | Prompt Speed | Generation Speed | Quality Score |
-|-------|-------------|-----------------|---------------|
+| Category | FP16 | INT8 | INT4 | Q4_K_M | Q5_K_M |
+|----------|------|------|------|---------|---------|
+| 🧠 Reasoning | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 📋 JSON Formatting | ⚠️ | ✅ | ❌ | ❌ | ❌ |
+| 📝 Constraint Adherence | ⚠️ | ⚠️ | ❌ | ⚠️ | ⚠️ |
+| 📖 Reading Comprehension | ❌ | ❌ | ❌ | ❌ | ⚠️ |
+| 🎭 Creativity & Tone | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Total Score** | **2/5** | **1.5/5** | **0/5** | **0/5** | **0/5** |
+
+---
+
+## ⚡ Speed vs Quality — All Formats
+
+| Model | Prompt Speed | Generation Speed | Quality |
+|-------|-------------|-----------------|---------|
 | FP16 | ~65 t/s | ~9.5 t/s | 2/5 |
-| INT8 | ~75 t/s | ~17 t/s | 1.5/5 |
-| INT4 | ~115 t/s | ~26 t/s | 0/5 |
-
-> INT4 is **2.7x faster** than FP16 but quality drops to near-zero on complex tasks.
-> INT8 hits a sweet spot — **1.8x faster** than FP16 with only marginal quality loss.
+| INT8 (Q8_0) | ~75 t/s | ~17 t/s | 1.5/5 |
+| INT4 (Q4_0) | ~115 t/s | ~26 t/s | 0/5 |
+| Q4_K_M | ~100 t/s | ~22 t/s | 0/5 |
+| Q5_K_M | ~67 t/s | ~20 t/s | 0/5 |
 
 ---
 
 ## 🔑 Key Takeaways
 
-1. **INT8 is the edge deployment sweet spot** — nearly half the RAM of FP16, nearly double the speed, acceptable quality loss for simple tasks.
-2. **INT4 is too aggressive for 1.1B models** — at this scale, INT4 destroys instruction-following ability.
-3. **All quantizations struggle with exact constraints** — word counts, sentence counts, and personas are hard for small models regardless of precision.
-4. **INT8 surprised on JSON formatting** — structured output tasks may actually benefit from quantization noise acting as regularization.
-5. **Model size matters more than quantization** — upgrading to a 3B model will improve results more than fighting INT4 degradation at 1.1B.
+1. **FP16 is still king for quality** — only format to pass reasoning at 1.1B scale.
+2. **INT8 is the edge deployment sweet spot** — 1.8x faster, half the RAM, acceptable quality.
+3. **K-quants did NOT help at 1.1B scale** — Q4_K_M and Q5_K_M scored same as Q4_0 (0/5). Better quantization math cannot compensate for insufficient model capacity.
+4. **The real bottleneck is model size, not quantization format** — upgrading to 3B+ will matter far more than switching quantization methods.
+5. **Q5_K_M was marginally better on word compression** — only detectable difference across K-quants.
+6. **INT8 beat all INT4 variants including K-quants** — for structured tasks, less compression = better results.
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] TinyLlama 1.1B — FP16, INT8, INT4 (Q4_0)
-- [x] HuggingFace model uploads — all 3 GGUF files available for download
-- [ ] TinyLlama 1.1B — Q4_K_M, Q5_K_M (better quantization methods)
-- [ ] Phi-2 (2.7B) — FP16, INT8, INT4
-- [ ] Qwen2-1.5B — FP16, INT8, INT4
-- [ ] Automated benchmark script
+- [x] TinyLlama 1.1B — Q4_K_M, Q5_K_M
+- [x] HuggingFace model uploads — GGUF files available for download
+- [ ] Upload Q4_K_M and Q5_K_M to HuggingFace
+- [ ] Phi-3-mini (3.8B) — FP16, INT8, INT4 on Lightning AI
+- [ ] Mistral-7B — INT4, Q4_K_M on Lightning AI
+- [ ] Automated Python benchmark script with CSV output
+- [ ] Speed vs Quality visualization chart
 
 ---
 
@@ -192,6 +205,7 @@ bash scripts/run_benchmark.sh models/TinyLlama-FP16.gguf FP16
 
 [![GitHub](https://img.shields.io/badge/GitHub-Yash1bajpai-black?logo=github)](https://github.com/Yash1bajpai)
 [![HuggingFace](https://img.shields.io/badge/🤗-Yash1bajpai-yellow)](https://huggingface.co/Yash1bajpai)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Yash%20Bajpai-blue?logo=linkedin)](https://www.linkedin.com/in/yash-bajpai-b5a86332a/)
 
 ---
 
