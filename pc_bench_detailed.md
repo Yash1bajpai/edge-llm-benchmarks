@@ -1,0 +1,1 @@
+| Model | Ctx | PP (t/s) | TG (t/s) | Model Size | KV Cache | Compute Buffer |\n|---|---|---|---|---|---|---|\n| Qwen-Q4 | 512 | N/A | N/A | Unknown | Unknown | Unknown |\n| Qwen-Q4 | 1024 | N/A | N/A | Unknown | Unknown | Unknown |\n| Qwen-Q8 | 512 | N/A | N/A | Unknown | Unknown | Unknown |\n

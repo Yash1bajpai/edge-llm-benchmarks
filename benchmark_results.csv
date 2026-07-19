@@ -1,0 +1,9 @@
+Model,Prompt Type,TTFT,Prompt T/s,Gen T/s
+Qwen2.5-3B-Instruct-Q4_K_M.gguf,Logic & Reasoning,N/A,N/A,N/A
+Qwen2.5-3B-Instruct-Q4_K_M.gguf,Reading Comprehension,N/A,N/A,N/A
+Qwen2.5-3B-Instruct-Q8_0.gguf,Logic & Reasoning,N/A,N/A,N/A
+Qwen2.5-3B-Instruct-Q8_0.gguf,Reading Comprehension,N/A,N/A,N/A
+Phi-3-mini-4k-instruct-Q4_K_M.gguf,Logic & Reasoning,N/A,N/A,N/A
+Phi-3-mini-4k-instruct-Q4_K_M.gguf,Reading Comprehension,N/A,N/A,N/A
+Phi-3-mini-4k-instruct-Q8_0.gguf,Logic & Reasoning,N/A,N/A,N/A
+Phi-3-mini-4k-instruct-Q8_0.gguf,Reading Comprehension,N/A,N/A,N/A

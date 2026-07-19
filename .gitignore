@@ -12,3 +12,9 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# LLM Benchmarking Specifics
+models/
+llama.cpp/
+*.log
+hf_token.txt
