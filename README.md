@@ -28,6 +28,18 @@ This repository benchmarks 4 leading sub-4B parameter models across different qu
 - `archive_scripts/` - Old debugging and exploratory scripts.
 - Model Folders - Each model has a dedicated folder containing specific test scripts, HuggingFace download links, and exact benchmark results.
 
+## 🔐 Reproducing (credentials)
+The phone-side scripts read SSH details from the environment — nothing is hardcoded:
+
+| Variable | Meaning |
+|---|---|
+| `PHONE_IP` | LAN IP of the phone running the Termux SSH server |
+| `PHONE_PORT` | SSH port (defaults to `8022`) |
+| `PHONE_USER` | Termux username |
+| `PHONE_PASS` | SSH password |
+
+Copy `.env.example` → `.env`, fill it in, and export those variables before running anything under `scripts/` or `archive_scripts/`. `.env` is gitignored.
+
 ## 🛠️ Hardware Setup
 - **Phone:** iQOO Z7s 5G (Snapdragon 695 "Parrot", 6GB RAM, Android 16, Termux environment)
 - **PC:** WSL2 on Windows (CPU Inference)

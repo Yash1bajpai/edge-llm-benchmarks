@@ -1,4 +1,5 @@
 import paramiko
+import os
 
 def run_ssh_command(host, port, user, password, command):
     client = paramiko.SSHClient()
@@ -17,4 +18,4 @@ def run_ssh_command(host, port, user, password, command):
         client.close()
 
 if __name__ == "__main__":
-    run_ssh_command('10.61.130.233', 8022, 'u0_a346', '1234567890', 'echo "Screen is off but I am still connected!"')
+    run_ssh_command(os.environ["PHONE_IP"], int(os.environ.get("PHONE_PORT", "8022")), os.environ["PHONE_USER"], os.environ["PHONE_PASS"], 'echo "Screen is off but I am still connected!"')

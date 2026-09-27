@@ -1,4 +1,5 @@
 import paramiko
+import os
 
 def run_ssh_command(host, port, user, password, command):
     client = paramiko.SSHClient()
@@ -15,4 +16,4 @@ if __name__ == "__main__":
     find /data/data/com.termux/files/home -name "*tiny*llama*.gguf" -o -name "*Tiny*Llama*.gguf" 2>/dev/null
     find /sdcard/ -name "*tiny*llama*.gguf" -o -name "*Tiny*Llama*.gguf" 2>/dev/null
     """
-    run_ssh_command('10.88.85.133', 8022, 'u0_a346', '1234567890', commands)
+    run_ssh_command(os.environ["PHONE_IP"], int(os.environ.get("PHONE_PORT", "8022")), os.environ["PHONE_USER"], os.environ["PHONE_PASS"], commands)

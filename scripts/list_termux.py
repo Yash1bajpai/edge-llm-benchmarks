@@ -10,16 +10,14 @@ def exec_ssh(command):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        client.connect(IP, port=PORT, username=USER, password=PASS, timeout=10)
+        client.connect(IP, port=PORT, username=USER, password=PASS, timeout=5)
         stdin, stdout, stderr = client.exec_command(command)
-        return stdout.read().decode('utf-8', errors='ignore').strip()
+        out = stdout.read().decode('utf-8', errors='ignore').strip()
+        return out
     except Exception as e:
-        return str(e)
+        return f"Error: {e}"
     finally:
         client.close()
 
 if __name__ == "__main__":
-    print("Phone GGUF files:")
-    print(exec_ssh("ls -lh *.gguf"))
-    print("\nTotal size of GGUF files:")
-    print(exec_ssh("du -ch *.gguf | grep total"))
+    print(exec_ssh("ls -lh ~/models"))

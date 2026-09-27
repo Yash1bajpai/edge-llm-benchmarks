@@ -1,10 +1,11 @@
 import paramiko
 import time
+import os
 
-IP = "10.61.130.233"
-PORT = 8022
-USER = "u0_a346"
-PASS = "1234567890"
+IP = os.environ["PHONE_IP"]
+PORT = int(os.environ.get("PHONE_PORT", "8022"))
+USER = os.environ["PHONE_USER"]
+PASS = os.environ["PHONE_PASS"]
 
 models = {
     "Qwen-Q8": "Qwen-Q8.gguf",

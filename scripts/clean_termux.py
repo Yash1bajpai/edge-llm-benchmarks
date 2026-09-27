@@ -10,22 +10,22 @@ def exec_ssh(command):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        client.connect(IP, port=PORT, username=USER, password=PASS, timeout=10)
+        client.connect(IP, port=PORT, username=USER, password=PASS, timeout=5)
         stdin, stdout, stderr = client.exec_command(command)
         out = stdout.read().decode('utf-8', errors='ignore').strip()
         err = stderr.read().decode('utf-8', errors='ignore').strip()
         return out, err
     except Exception as e:
-        return "", str(e)
+        return "", f"Error: {e}"
     finally:
         client.close()
 
 if __name__ == "__main__":
-    print("Deleting GGUF files from Phone...")
-    out, err = exec_ssh("rm -f *.gguf")
+    print("Deleting models and Inditrade_AI...")
+    out, err = exec_ssh("rm -rf ~/models/* ~/Inditrade_AI")
+    
     if err:
-        print("Error:", err)
+        print("Error during deletion:", err)
     else:
-        print("Done. Verifying...")
-        out2, err2 = exec_ssh("ls -lh *.gguf")
-        print("Remaining files:", out2)
+        print("Success! Checking remaining files in ~:")
+        print(exec_ssh("ls -lh ~")[0])
